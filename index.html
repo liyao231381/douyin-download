@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>抖音视频信息获取</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #input-container {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #input-container label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        #input-container input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        #input-container button {
+            padding: 8px 16px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            align-self: flex-end; /* Align to the right in flex container */
+        }
+
+        #input-container button:hover {
+            background-color: #ff8c00;
+        }
+
+        .styled-button {
+            padding: 8px 16px;
+            background-color: #00aaff; /* Use blue or any preferred color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .styled-button:hover {
+            background-color: #0088cc;
+        }
+
+        .styled-button svg {
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        #info-container,
+        #content-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #info-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #info-container div {
+            margin-bottom: 10px;
+        }
+
+        #info-container .link-container {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #ffa500;
+        }
+
+        #info-text-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cover-image {
+            width: auto;
+            height: auto;
+            max-width: 200px;
+            max-height: 300px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 0.5rem;
+        }
+
+        #content-container {
+            text-align: center;
+        }
+
+        .image-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .image-container {
+            width: 50%; /* Mobile: 2 images per row */
+            padding: 5px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative; /* Make this a positioned container */
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10; /* Ensure it's above the image */
+            display: flex;
+            align-items: center;
+            font-size: 12px; /* Make sure it is readable */
+            line-height: 1; /* Adjust as needed for vertical centering */
+        }
+
+        .image-container:hover .download-icon {
+            opacity: 1;
+        }
+
+        .download-icon svg {
+            width: 16px;
+            height: 16px;
+            fill: white;
+            margin-right: 5px;
+        }
+
+        #video-player {
+            max-width: 100%;
+        }
+
+        /* History Styles */
+        #history-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .delete-history {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            text-decoration: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+            font-size: 14px; /* Make sure it is readable */
+            line-height: 1; /* Adjust as needed for vertical centering */
+        }
+
+        .history-item:hover .delete-history {
+            opacity: 1;
+        }
+
+
+        /* Desktop Styles */
+        @media (min-width: 768px) {
+            #main-container {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 15px;
+            }
+
+            #input-container {
+                width: 50%;
+                flex-direction: column; /* Stack labels and inputs */
+                flex: 1;
+            }
+
+            #info-container {
+                width: 50%;
+                flex-direction: row; /* Horizontal layout for info and cover */
+                align-items: flex-start; /* Align items to the top */
+                flex: 2;
+            }
+
+            #info-text-container {
+                width: 60%; /* Adjust as needed, leaving space for the image */
+                flex-direction: column;
+            }
+
+            .cover-image {
+                width: auto;
+                height: auto;
+                max-width: 40%;
+                max-height: 300px;
+                border-radius: 4px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                margin: 0 auto;
+            }
+
+            #content-container {
+                width: calc(100% - 20px);
+                text-align: center;
+            }
+             .image-container {
+                width: 20%; /* Desktop: 5 images per row */
+            }
+        }
+
+        #download-all-container {
+            display: flex;
+            align-items: center; /*  Align items vertically in the container */
+            margin-bottom: 10px;
+            justify-content: center; /* Center the items horizontally */
+        }
+
+        #download-all-container input[type="text"] {
+            width: 150px; /* Adjust the width as needed */
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-right: 5px; /* Add some spacing between the input and button */
+            height: 32px;  /* Match button height */
+        }
+
+        #download-all-container button {
+            padding: 8px 16px;
+            background-color: #00aaff; /* Use blue or any preferred color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            height: 32px; /* Set the height of the button */
+        }
+
+        #download-all-container button:hover {
+            background-color: #0088cc;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>抖音视频信息获取</h1>
+
+    <div id="main-container">
+        <div id="input-container">
+            <label for="id">ID:</label>
+            <input type="text" id="id" name="id" placeholder="请输入您的ID" value="10003120">
+
+            <label for="key">Key:</label>
+            <input type="text" id="key" name="key" placeholder="请输入您的Key" value="bfb75036b210ed35bee6e002d623293c">
+
+            <label for="douyin-url">抖音视频链接:</label>
+            <input type="text" id="douyin-url" name="douyin-url" placeholder="请输入抖音视频链接">
+
+            <button onclick="fetchData()">获取信息</button>
+        </div>
+
+        <div id="info-container">
+          <div id="info-text-container"></div>
+        </div>
+    </div>
+    <div id="content-container"></div>
+
+    <div id="history-container">
+        <h2>历史记录</h2>
+        <ul id="history-list"></ul>
+    </div>
+
+    <script>
+        // 从 localStorage 加载 ID 和 Key
+        document.getElementById("id").value = localStorage.getItem("id") || "";
+        document.getElementById("key").value = localStorage.getItem("key") || "";
+
+        let history = JSON.parse(localStorage.getItem("douyinHistory") || "[]");
+        displayHistory();
+
+        function fetchData() {
+            const id = document.getElementById("id").value;
+            const key = document.getElementById("key").value;
+            let douyinUrl = document.getElementById("douyin-url").value;
+
+            if (!id || !key) {
+                alert("请输入 ID 和 Key!");
+                return;
+            }
+
+            if (!douyinUrl) {
+                alert("请输入抖音视频链接!");
+                return;
+            }
+
+            // 提取抖音链接
+            if (!douyinUrl.startsWith("https://")) {
+                const match = douyinUrl.match(/https:\/\/v\.douyin\.com\/[^\s]+/);
+                if (match) {
+                    douyinUrl = match[0];
+                    // 找到最后一个 / 的位置
+                    const lastSlashIndex = douyinUrl.lastIndexOf('/');
+                    // 提取链接到最后一个 /
+                    douyinUrl = douyinUrl.substring(0, lastSlashIndex + 1);
+
+                } else {
+                    alert("无法从输入中提取有效的抖音链接.");
+                    return;
+                }
+            }
+
+            // 保存 ID 和 Key 到 localStorage
+            localStorage.setItem("id", id);
+            localStorage.setItem("key", key);
+
+            const apiUrl = `https://cn.apihz.cn/api/fun/douyin.php?id=${id}&key=${key}&url=${douyinUrl}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.code === 200) {
+                        addToHistory(douyinUrl, data);
+                    }
+                    displayData(data);
+                })
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                    document.getElementById("info-container").textContent = `Error: ${error}`;
+                    document.getElementById("content-container").textContent = "";
+                });
+        }
+
+       function displayData(data) {
+            const infoContainer = document.getElementById("info-container");
+            const infoTextContainer = document.getElementById("info-text-container");
+            const contentContainer = document.getElementById("content-container");
+
+            infoContainer.innerHTML = "";
+            infoTextContainer.innerHTML = "";
+            contentContainer.innerHTML = "";
+
+            if (data.code !== 200) {
+                infoContainer.textContent = `Error: ${data.code}`;
+                return;
+            }
+
+            // Display Author, Title, Link in infoTextContainer
+            infoTextContainer.innerHTML += `<div><strong>作者:</strong> ${data.name}</div>`;
+            infoTextContainer.innerHTML += `<div><strong>标题:</strong> ${data.title}</div>`;
+
+            // Display Cover Image in infoContainer
+            const coverImage = document.createElement('img');
+            coverImage.src = data.cover;
+            coverImage.alt = '封面';
+            coverImage.className = "cover-image";
+            infoContainer.appendChild(coverImage);
+            infoContainer.appendChild(infoTextContainer);
+
+
+            // Display Images/Video in contentContainer
+            if (data.type === "视频") {
+                infoTextContainer.innerHTML += `<div class="link-container"><strong>下载:</strong> <a href="${data.yvideo}" target="_blank">${data.yvideo}</a></div>`;
+                contentContainer.innerHTML += `
+                    <video id="video-player" controls>
+                        <source src="${data.video}" type="video/mp4">
+                        您的浏览器不支持 HTML5 视频。
+                    </video>
+                `;
+            } else if (data.type === "图集") {
+                // Container for filename input and download button
+                const downloadAllContainer = document.createElement("div");
+                downloadAllContainer.id = "download-all-container";
+
+                // Filename Input
+                const filenameInput = document.createElement("input");
+                filenameInput.type = "text";
+                filenameInput.id = "filename-input";
+                filenameInput.placeholder = "输入文件名";
+                filenameInput.value = "抖音图片"; // Default filename
+                downloadAllContainer.appendChild(filenameInput);
+
+                // One-click download all images
+                const downloadAllButton = document.createElement("button");
+                downloadAllButton.textContent = "一键下载所有图片";
+                downloadAllButton.className = "styled-button";
+
+                downloadAllButton.addEventListener('click', () => {
+                    const filename = document.getElementById("filename-input").value || "douyin_images"; // Get filename from input
+                    downloadAllImages(data.images, filename);
+                });
+
+                downloadAllContainer.appendChild(downloadAllButton);
+                contentContainer.appendChild(downloadAllContainer);
+
+                const imageGrid = document.createElement("div");
+                imageGrid.className = "image-grid";
+
+                data.images.forEach((imageUrl, index) => {
+                    const imageContainer = document.createElement("div");
+                    imageContainer.className = "image-container";
+                    imageContainer.innerHTML = `
+                        <img src="${imageUrl}" alt="图片 ${index + 1}">
+                        <a class="download-icon" href="#" data-url="${imageUrl}" data-filename="image${index + 1}.jpg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                        </a>
+                    `;
+                    imageGrid.appendChild(imageContainer);
+                });
+
+                imageGrid.addEventListener('click', function(event) {
+                   if (event.target.closest('.download-icon')) {
+                       event.preventDefault(); // Prevent the link from navigating
+                       const downloadLink = event.target.closest('.download-icon');
+                       const imageUrl = downloadLink.dataset.url;
+                       const filename = downloadLink.dataset.filename;
+                       downloadResource(imageUrl, filename);
+                   }
+                });
+
+
+                contentContainer.appendChild(imageGrid);
+
+            } else {
+                contentContainer.textContent = `类型: ${data.type}`;
+            }
+        }
+
+       function downloadResource(url, filename) {
+            fetch(url, {
+                mode: 'cors',
+                redirect: 'follow' // Add redirect: 'follow'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);  // Clean up
+                document.body.removeChild(a);
+            })
+            .catch(error => console.error('Download error:', error));
+        }
+
+        function downloadAllImages(imageUrls, baseFilename) {
+            imageUrls.forEach((imageUrl, index) => {
+                downloadResource(imageUrl, `${baseFilename}_${index + 1}.jpg`);
+            });
+        }
+
+        function addToHistory(url, data) {
+            const existingIndex = history.findIndex(item => item.url === url);
+            if (existingIndex !== -1) {
+                history.splice(existingIndex, 1); // Remove old entry if it exists
+            }
+            history.unshift({ url: url, data: data });
+            if (history.length > 10) {
+                history.pop(); // Limit to 10 entries
+            }
+            localStorage.setItem("douyinHistory", JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const historyList = document.getElementById("history-list");
+            historyList.innerHTML = "";
+            history.forEach((item, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "history-item";
+                listItem.innerHTML = `
+                    <a href="#" onclick="loadHistoryItem(${index})">${item.url}</a>
+                    <span class="delete-history" onclick="deleteHistoryItem(${index})">×</span>
+                `;
+                historyList.appendChild(listItem);
+            });
+        }
+
+        function loadHistoryItem(index) {
+            const item = history[index];
+            document.getElementById("douyin-url").value = item.url;
+            displayData(item.data);
+        }
+
+        function deleteHistoryItem(index) {
+            history.splice(index, 1);
+            localStorage.setItem("douyinHistory", JSON.stringify(history));
+            displayHistory();
+            //Clear the data currently displayed
+            document.getElementById("info-container").innerHTML = "";
+            document.getElementById("info-text-container").innerHTML = "";
+            document.getElementById("content-container").innerHTML = "";
+            document.getElementById("douyin-url").value = "";
+        }
+    </script>
+</body>
+</html>
