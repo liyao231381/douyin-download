@@ -26,6 +26,42 @@
             margin-bottom: 5px;
             color: #555;
         }
+        
+        /* Custom Select Styles */
+        .styled-select {
+            appearance: none; /* Remove default arrow */
+            -webkit-appearance: none; /* For older versions of Safari */
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 30px 8px 12px; /* Adjust padding for arrow space */
+            font-size: 16px;
+            color: #555;
+            width: 100%; /* Make it full width */
+            box-sizing: border-box; /* Include padding in width */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23555'%3E%3Cpath d='M6 8.17L1.83 4l-.71.71L6 9.59l4.88-4.88-.71-.71L6 8.17z'/%3E%3C/svg%3E"); /* Custom arrow icon */
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .styled-select:hover {
+            border-color: #999;
+        }
+
+        .styled-select:focus {
+            outline: none;
+            border-color: #00aaff; /* Highlight on focus */
+            box-shadow: 0 0 5px rgba(0, 170, 255, 0.5); /* Add a subtle shadow */
+        }
+
+        /* Optional: Style the options in the dropdown */
+        .styled-select option {
+            font-size: 16px;
+            padding: 8px;
+            color: #555;
+        }
 
         #input-container input[type="text"] {
             width: 100%;
@@ -302,6 +338,15 @@
 
     <div id="main-container">
         <div id="input-container">
+
+            <label for="api-route">API线路:</label>
+            <select id="api-route" name="api-route" class="styled-select">
+                <option value="0">默认线路</option>
+                <option value="1">线路1</option>
+                <option value="2">线路2</option>
+                <option value="3">线路3</option>
+            </select>
+
             <label for="id">ID:10003120</label>
             <input type="text" id="id" name="id" placeholder="请输入您的ID" value="10003120">
 
@@ -326,17 +371,45 @@
     </div>
 
     <script>
-        // 从 localStorage 加载 ID 和 Key
-        document.getElementById("id").value = localStorage.getItem("id") || "";
-        document.getElementById("key").value = localStorage.getItem("key") || "";
+        // 预设的 ID 和 Key
+        const defaultId = "10003120";
+        const defaultKey = "bfb75036b210ed35bee6e002d623293c";
+
+        // 从 localStorage 加载 ID 和 Key，如果 localStorage 中没有，则使用预设值
+        const idInput = document.getElementById("id");
+        const keyInput = document.getElementById("key");
+
+        idInput.value = localStorage.getItem("id") || defaultId;
+        keyInput.value = localStorage.getItem("key") || defaultKey;
+
+        //API 线路
+        const apiRoutes = [
+            "https://cn.apihz.cn/api/fun/douyin.php",
+            "http://101.35.2.25/api/fun/douyin.php",
+            "http://124.222.204.22/api/fun/douyin.php",
+            "http://124.220.49.230/api/fun/douyin.php"
+        ];
+
+        // 从 localStorage 加载 API 线路
+        const storedRoute = localStorage.getItem("apiRoute") || "0"; // 默认线路
+        document.getElementById("api-route").value = storedRoute;
 
         let history = JSON.parse(localStorage.getItem("douyinHistory") || "[]");
         displayHistory();
+
+        function getCurrentApiUrl() {
+            const routeIndex = parseInt(document.getElementById("api-route").value);
+            return apiRoutes[routeIndex] || apiRoutes[0]; // 默认使用第一个线路
+        }
 
         function fetchData() {
             const id = document.getElementById("id").value;
             const key = document.getElementById("key").value;
             let douyinUrl = document.getElementById("douyin-url").value;
+            const selectedRoute = document.getElementById("api-route").value;
+
+            // 保存 API 线路 到 localStorage
+            localStorage.setItem("apiRoute", selectedRoute);
 
             if (!id || !key) {
                 alert("请输入 ID 和 Key!");
@@ -368,7 +441,19 @@
             localStorage.setItem("id", id);
             localStorage.setItem("key", key);
 
-            const apiUrl = `https://cn.apihz.cn/api/fun/douyin.php?id=${id}&key=${key}&url=${douyinUrl}`;
+            // 尝试所有的 API 线路
+            tryFetchData(0, id, key, douyinUrl);
+        }
+
+        function tryFetchData(routeIndex, id, key, douyinUrl) {
+            if (routeIndex >= apiRoutes.length) {
+                // 所有线路都失败了
+                document.getElementById("info-container").textContent = "所有线路请求失败，请稍后重试!";
+                document.getElementById("content-container").textContent = "";
+                return;
+            }
+
+            const apiUrl = `${apiRoutes[routeIndex]}?id=${id}&key=${key}&url=${douyinUrl}`;
 
             fetch(apiUrl)
                 .then(response => {
@@ -384,9 +469,10 @@
                     displayData(data);
                 })
                 .catch(error => {
-                    console.error("Error fetching data:", error);
-                    document.getElementById("info-container").textContent = `Error: ${error}`;
-                    document.getElementById("content-container").textContent = "";
+                    console.error(`Error fetching data from route ${routeIndex + 1}:`, error);
+                    // 切换到下一个线路
+                    console.log(`尝试切换到下一个线路: ${routeIndex + 2}`);
+                    tryFetchData(routeIndex + 1, id, key, douyinUrl); // 递归调用，尝试下一个线路
                 });
         }
 
