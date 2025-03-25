@@ -355,8 +355,10 @@
 
             <label for="douyin-url">抖音视频链接:</label>
             <input type="text" id="douyin-url" name="douyin-url" placeholder="请输入抖音视频链接">
-
-            <button onclick="fetchData()">获取信息</button>
+            <div class="buttons">
+                <button onclick="pasteUrl()">粘贴链接</button>
+                <button onclick="fetchData()">获取信息</button>
+            </div>
         </div>
 
         <div id="info-container">
@@ -614,6 +616,14 @@
                     console.error('复制失败: ', err);
                     alert("复制失败，请手动复制！");
                 });
+        }
+
+        function pasteUrl() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('douyin-url').value = text;
+            }).catch(err => {
+                console.error('无法读取剪贴板内容: ', err);
+            });
         }
 
        function downloadResource(url, filename) {
