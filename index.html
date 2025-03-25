@@ -505,10 +505,22 @@
 
             // Display Images/Video in contentContainer
             if (data.type === "视频") {
-                infoTextContainer.innerHTML += `<div class="link-container"><strong>下载:</strong> <a href="${data.yvideo}" target="_blank">${data.yvideo}</a></div>`;
+                // 创建下载链接
+                const downloadLink = document.createElement('a');
+                downloadLink.href = `/api/download?url=${encodeURIComponent(data.yvideo)}`; // 修改为相对路径
+                downloadLink.textContent = "下载视频";
+                downloadLink.target = "_blank"; // 在新标签页中打开
+                downloadLink.className = "styled-button"; // 应用你的样式
+
+                // 将下载链接添加到 infoTextContainer
+                const downloadContainer = document.createElement('div');
+                downloadContainer.appendChild(document.createTextNode("下载: "));
+                downloadContainer.appendChild(downloadLink);
+                infoTextContainer.appendChild(downloadContainer);
+
                 contentContainer.innerHTML += `
                     <video id="video-player" controls>
-                        <source src="${data.video}" type="video/mp4">
+                        <source src="/api/video?url=${encodeURIComponent(data.video)}" type="video/mp4">
                         您的浏览器不支持 HTML5 视频。
                     </video>
                 `;
