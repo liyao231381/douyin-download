@@ -505,15 +505,15 @@
             if (data.type === "视频") {
                 // 创建下载链接
                 const downloadLink = document.createElement('a');
-                downloadLink.href = `/api/download?url=${encodeURIComponent(data.video)}`;
+                downloadLink.href = `/api/download?url=${encodeURIComponent(data.yvideo)}`;
                 downloadLink.textContent = "下载视频";
                 downloadLink.target = "_blank";
                 downloadLink.className = "styled-button";
 
                 // 创建显示 URL 的 <a> 标签
                 const videoUrlLink = document.createElement('a');
-                videoUrlLink.href = data.video;
-                videoUrlLink.textContent = data.video;
+                videoUrlLink.href = data.yvideo;
+                videoUrlLink.textContent = data.yvideo;
                 videoUrlLink.target = "_blank";
                 videoUrlLink.style.display = 'block'; // 使其独占一行
                 videoUrlLink.style.marginTop = '5px'; // 增加一些间距
@@ -524,7 +524,7 @@
                 copyButton.className = "styled-button";
                 copyButton.style.marginLeft = '5px'; // 增加一些间距
                 copyButton.addEventListener('click', () => {
-                    copyToClipboard(data.video);
+                    copyToClipboard(data.yvideo);
                 });
 
                 // 将下载链接、URL 链接和复制按钮添加到 infoTextContainer
@@ -542,7 +542,7 @@
 
                 contentContainer.innerHTML += `
                     <video id="video-player" controls>
-                        <source src="/api/video?url=${encodeURIComponent(data.video)}" type="video/mp4">
+                        <source src="/api/video?url=${encodeURIComponent(data.yvideo)}" type="video/mp4">
                         您的浏览器不支持 HTML5 视频。
                     </video>
                 `;
