@@ -502,21 +502,43 @@
             infoContainer.appendChild(coverImage);
             infoContainer.appendChild(infoTextContainer);
 
-
-            // Display Images/Video in contentContainer
             if (data.type === "视频") {
                 // 创建下载链接
                 const downloadLink = document.createElement('a');
-                downloadLink.href = `/api/download?url=${encodeURIComponent(data.yvideo)}`; // 修改为相对路径
+                downloadLink.href = `/api/download?url=${encodeURIComponent(data.yvideo)}`;
                 downloadLink.textContent = "下载视频";
-                downloadLink.target = "_blank"; // 在新标签页中打开
-                downloadLink.className = "styled-button"; // 应用你的样式
+                downloadLink.target = "_blank";
+                downloadLink.className = "styled-button";
 
-                // 将下载链接添加到 infoTextContainer
+                // 创建显示 URL 的 <a> 标签
+                const videoUrlLink = document.createElement('a');
+                videoUrlLink.href = data.yvideo;
+                videoUrlLink.textContent = data.yvideo;
+                videoUrlLink.target = "_blank";
+                videoUrlLink.style.display = 'block'; // 使其独占一行
+                videoUrlLink.style.marginTop = '5px'; // 增加一些间距
+
+                // 创建复制按钮
+                const copyButton = document.createElement('button');
+                copyButton.textContent = "复制链接";
+                copyButton.className = "styled-button";
+                copyButton.style.marginLeft = '5px'; // 增加一些间距
+                copyButton.addEventListener('click', () => {
+                    copyToClipboard(data.yvideo);
+                });
+
+                // 将下载链接、URL 链接和复制按钮添加到 infoTextContainer
                 const downloadContainer = document.createElement('div');
                 downloadContainer.appendChild(document.createTextNode("下载: "));
                 downloadContainer.appendChild(downloadLink);
+
+                const urlContainer = document.createElement('div');
+                urlContainer.appendChild(document.createTextNode("链接: "));
+                urlContainer.appendChild(videoUrlLink);
+                urlContainer.appendChild(copyButton);
+
                 infoTextContainer.appendChild(downloadContainer);
+                infoTextContainer.appendChild(urlContainer);
 
                 contentContainer.innerHTML += `
                     <video id="video-player" controls>
@@ -581,6 +603,17 @@
             } else {
                 contentContainer.textContent = `类型: ${data.type}`;
             }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert("链接已复制到剪贴板！");
+                })
+                .catch(err => {
+                    console.error('复制失败: ', err);
+                    alert("复制失败，请手动复制！");
+                });
         }
 
        function downloadResource(url, filename) {

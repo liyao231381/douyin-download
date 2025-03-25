@@ -1,10 +1,19 @@
 const request = require('request');
+const path = require('path'); // 引入 path 模块
 
 module.exports = (req, res) => {
     const videoUrl = req.query.url;
 
     if (!videoUrl) {
         return res.status(400).send('Missing video URL');
+    }
+
+    // 从 URL 获取文件名
+    let filename = path.basename(videoUrl);
+
+    // 确保文件名包含 .mp4 后缀
+    if (!filename.toLowerCase().endsWith('.mp4')) {
+        filename += '.mp4';
     }
 
     // 设置正确的请求头 (从浏览器的开发者工具中复制)
@@ -17,6 +26,7 @@ module.exports = (req, res) => {
     };
 
     // 设置响应头
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Type', 'video/mp4');
     res.setHeader('Access-Control-Allow-Origin', '*'); // 允许所有来源 (仅用于开发环境)
 
