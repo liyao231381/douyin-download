@@ -255,15 +255,16 @@
             localStorage.setItem("key", key);
 
             // Show loading state
-            fetchBtn.innerHTML = '<span class="button-loading"></span>';
+            const originalButtonContent = fetchBtn.innerHTML; // Save original content
+            fetchBtn.innerHTML = ''; // Clear content
             fetchBtn.classList.add('button-loading');
             fetchBtn.disabled = true;
 
             // 尝试所有的 API 线路
-            tryFetchData(0, id, key, douyinUrl);
+            tryFetchData(0, id, key, douyinUrl, originalButtonContent); // Pass original content
         }
 
-        function tryFetchData(routeIndex, id, key, douyinUrl) {
+        function tryFetchData(routeIndex, id, key, douyinUrl, originalButtonContent) { // Receive original content
             if (routeIndex >= apiRoutes.length) {
                 // 所有线路都失败了
                 document.getElementById("info-container").innerHTML = `
@@ -280,7 +281,7 @@
                 `;
 
                 // Reset button
-                fetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> 获取信息';
+                fetchBtn.innerHTML = originalButtonContent; // Restore original content
                 fetchBtn.classList.remove('button-loading');
                 fetchBtn.disabled = false;
 
@@ -303,7 +304,7 @@
                     displayData(data);
 
                     // Reset button
-                    fetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> 获取信息';
+                    fetchBtn.innerHTML = originalButtonContent; // Restore original content
                     fetchBtn.classList.remove('button-loading');
                     fetchBtn.disabled = false;
                 })
@@ -311,7 +312,7 @@
                     console.error(`Error fetching data from route ${routeIndex + 1}:`, error);
                     // 切换到下一个线路
                     console.log(`尝试切换到下一个线路: ${routeIndex + 2}`);
-                    tryFetchData(routeIndex + 1, id, key, douyinUrl); // 递归调用，尝试下一个线路
+                    tryFetchData(routeIndex + 1, id, key, douyinUrl, originalButtonContent); // Pass original content
                 });
         }
 
