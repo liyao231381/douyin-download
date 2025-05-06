@@ -86,15 +86,14 @@
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-10xl">
-
+    <div class="container max-w-full h-screen">
         <!-- Main layout container -->
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row">
 
             <!-- Left column (Parameters and History) -->
-            <div class="flex flex-col gap-6 w-full lg:w-1/4">
+            <div class="flex flex-col w-full lg:w-1/4 lg:h-screen">
                 <!-- Input panel -->
-                <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="bg-white p-6 border-b">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                         <i class="fas fa-cog text-orange-500 mr-2"></i> 参数设置
                     </h2>
@@ -150,7 +149,7 @@
                 </div>
 
                 <!-- History panel -->
-                <div id="history-container" class="bg-white rounded-xl shadow-md p-6">
+                <div id="history-container" class="bg-white p-6 lg:h-1/2 overflow-y-auto">
                     <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                         <i class="fas fa-history text-green-500 mr-2"></i> 历史记录
                     </h2>
@@ -162,22 +161,19 @@
                 </div>
             </div>
 
-            <!-- Right column (Info and Content) -->
-            <div class="flex flex-col gap-6 w-full lg:w-3/4">
-                <!-- Info panel -->
-                <div id="info-container" class="bg-white rounded-xl shadow-md p-6 flex-grow">
-                    <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                        <i class="fas fa-info-circle text-4xl mb-2"></i>
-                        <p>请输入抖音链接并点击"获取信息"</p>
-                    </div>
+            <!-- Content panel -->
+            <div id="content-container" class="bg-white p-6 border flex-grow w-full lg:w-1/2 lg:h-screen overflow-y-auto">
+                <div class="flex flex-col items-center justify-center h-32 text-gray-400">
+                    <i class="fas fa-photo-video text-4xl mb-2"></i>
+                    <p>内容将显示在这里</p>
                 </div>
+            </div>
 
-                <!-- Content panel -->
-                <div id="content-container" class="bg-white rounded-xl shadow-md p-6 flex-grow">
-                    <div class="flex flex-col items-center justify-center h-32 text-gray-400">
-                        <i class="fas fa-photo-video text-4xl mb-2"></i>
-                        <p>内容将显示在这里</p>
-                    </div>
+            <!-- Info panel -->
+            <div id="info-container" class="bg-white p-6 flex-grow w-full lg:w-1/4 lg:h-screen overflow-y-auto">
+                <div class="flex flex-col items-center justify-center h-full text-gray-400">
+                    <i class="fas fa-info-circle text-4xl mb-2"></i>
+                    <p>请输入抖音链接并点击"获取信息"</p>
                 </div>
             </div>
         </div>
@@ -339,8 +335,8 @@
 
             // Display Author, Title
             infoDiv.innerHTML = `
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="md:w-1/4">
+                <div class="flex flex-col gap-6">
+                    <div>
                         <img src="${data.cover}" alt="封面" class="w-full h-auto rounded-lg shadow-md">
                     </div>
                     <div class="md:w-3/4">
@@ -609,11 +605,13 @@
             document.getElementById("douyin-url").value = item.url;
             displayData(item.data);
 
-            // Scroll to top
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
+            // Scroll to bottom after delay
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 200); // 0.2 seconds delay
 
             showAlert("已加载历史记录！", "success");
         }
