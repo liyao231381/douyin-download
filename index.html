@@ -404,16 +404,32 @@
                         <i class="fas fa-images text-green-500 mr-2"></i> 图片预览 (${data.images.length}张)
                     </h3>
 
-                    <div class="flex flex-col sm:flex-row items-center gap-3 mb-4 bg-gray-50 p-3 rounded-lg">
-                        <input type="text" id="filename-input" placeholder="输入文件名"
-                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            value="抖音图片">
-                        <button onclick="downloadAllImages(${JSON.stringify(data.images)}, document.getElementById('filename-input').value || 'douyin_images')"
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-all whitespace-nowrap">
-                            <i class="fas fa-download mr-2"></i> 一键下载所有图片
-                        </button>
-                    </div>
                 `;
+
+                // Container for filename input and download all button
+                const downloadAllContainer = document.createElement("div");
+                downloadAllContainer.className = "flex flex-col sm:flex-row items-center gap-3 mb-4 bg-gray-50 p-3 rounded-lg";
+
+                const filenameInput = document.createElement("input");
+                filenameInput.type = "text";
+                filenameInput.id = "filename-input";
+                filenameInput.placeholder = "输入文件名";
+                filenameInput.className = "flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                filenameInput.value = "抖音图片"; // Default filename
+                downloadAllContainer.appendChild(filenameInput);
+
+                const downloadAllButton = document.createElement("button");
+                downloadAllButton.textContent = "一键下载所有图片";
+                downloadAllButton.className = "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-all whitespace-nowrap";
+                downloadAllButton.innerHTML = '<i class="fas fa-download mr-2"></i> 一键下载所有图片'; // Add icon
+
+                downloadAllButton.addEventListener('click', () => {
+                    const filename = document.getElementById("filename-input").value || "douyin_images"; // Get filename from input
+                    downloadAllImages(data.images, filename);
+                });
+
+                downloadAllContainer.appendChild(downloadAllButton);
+                imageContentDiv.appendChild(downloadAllContainer); // Append to imageContentDiv
 
                 // Create the image grid container
                 const imageGrid = document.createElement("div");
@@ -425,7 +441,9 @@
                        event.preventDefault(); // Prevent the link from navigating
                        const downloadLink = event.target.closest('.download-icon');
                        const imageUrl = downloadLink.dataset.url;
-                       const filename = downloadLink.dataset.filename;
+                       const baseFilename = document.getElementById('filename-input').value || 'douyin_image'; // Get filename from input
+                       const index = Array.from(imageGrid.children).indexOf(downloadLink.closest('.image-container')); // Get the index of the image
+                       const filename = `${baseFilename}_${index + 1}.jpg`; // Construct filename
                        downloadResource(imageUrl, filename); // Use the existing downloadResource function
                    }
                 });
