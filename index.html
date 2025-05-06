@@ -116,7 +116,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                 <i class="fas fa-id-card text-purple-500 mr-2 text-xs"></i> ID
                             </label>
-                            <input type="text" id="id" placeholder="请输入您的ID" 
+                            <input type="text" id="id" placeholder="请输入您的ID"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
@@ -124,7 +124,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                 <i class="fas fa-key text-yellow-500 mr-2 text-xs"></i> Key
                             </label>
-                            <input type="text" id="key" placeholder="请输入您的Key" 
+                            <input type="text" id="key" placeholder="请输入您的Key"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         </div>
 
@@ -132,15 +132,15 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                                 <i class="fab fa-tiktok text-pink-500 mr-2 text-xs"></i> 抖音视频链接
                             </label>
-                            <input type="text" id="douyin-url" placeholder="请输入抖音视频链接" 
+                            <input type="text" id="douyin-url" placeholder="请输入抖音视频链接"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2">
-                            
+
                             <div class="flex justify-between">
-                                <button onclick="pasteUrl()" 
+                                <button onclick="pasteUrl()"
                                     class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg flex items-center transition-all">
                                     <i class="fas fa-paste mr-2"></i> 粘贴链接
                                 </button>
-                                <button id="fetch-btn" onclick="fetchData()" 
+                                <button id="fetch-btn" onclick="fetchData()"
                                     class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-all">
                                     <i class="fas fa-cloud-download-alt mr-2"></i> 获取信息
                                 </button>
@@ -278,12 +278,12 @@
                         <p>内容将显示在这里</p>
                     </div>
                 `;
-                
+
                 // Reset button
                 fetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> 获取信息';
                 fetchBtn.classList.remove('button-loading');
                 fetchBtn.disabled = false;
-                
+
                 return;
             }
 
@@ -301,7 +301,7 @@
                         addToHistory(douyinUrl, data);
                     }
                     displayData(data);
-                    
+
                     // Reset button
                     fetchBtn.innerHTML = '<i class="fas fa-cloud-download-alt mr-2"></i> 获取信息';
                     fetchBtn.classList.remove('button-loading');
@@ -335,7 +335,7 @@
             // Create info container with fade-in animation
             const infoDiv = document.createElement('div');
             infoDiv.className = 'fade-in';
-            
+
             // Display Author, Title
             infoDiv.innerHTML = `
                 <div class="flex flex-col md:flex-row gap-6">
@@ -358,7 +358,7 @@
                 infoDiv.innerHTML += `
                         <div class="mt-4 flex flex-row gap-4">
                             <div>
-                                <button onclick="copyToClipboard('${data.yvideo}')" 
+                                <button onclick="copyToClipboard('${data.yvideo}')"
                                     class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
                                     <i class="fas fa-copy mr-2"></i> 复制链接
                                 </button>
@@ -387,7 +387,7 @@
                 infoDiv.innerHTML += `
                         <div class="mt-4">
                             <div>
-                                <button onclick="copyToClipboard('${data.images[0]}')" 
+                                <button onclick="copyToClipboard('${data.images[0]}')"
                                     class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
                                     <i class="fas fa-copy mr-2"></i> 复制封面链接
                                 </button>
@@ -395,43 +395,60 @@
                         </div>
                 `;
 
-                // Container for filename input and download button
-                contentContainer.innerHTML = `
-                    <div class="fade-in">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                            <i class="fas fa-images text-green-500 mr-2"></i> 图片预览 (${data.images.length}张)
-                        </h3>
-                        
-                        <div class="flex flex-col sm:flex-row items-center gap-3 mb-4 bg-gray-50 p-3 rounded-lg">
-                            <input type="text" id="filename-input" placeholder="输入文件名" 
-                                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                value="抖音图片">
-                            <button onclick="downloadAllImages(${JSON.stringify(data.images)}, document.getElementById('filename-input').value || 'douyin_images')" 
-                                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-all whitespace-nowrap">
-                                <i class="fas fa-download mr-2"></i> 一键下载所有图片
-                            </button>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                `;
+                // Use DOM manipulation to build the content container for image sets
+                const imageContentDiv = document.createElement('div');
+                imageContentDiv.className = 'fade-in';
 
-                data.images.forEach((imageUrl, index) => {
-                    contentContainer.innerHTML += `
-                            <div class="image-container relative group rounded-lg overflow-hidden transition-all">
-                                <img src="${imageUrl}" alt="图片 ${index + 1}" class="w-full h-auto object-cover transition-all">
-                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all"></div>
-                                <button onclick="downloadResource('${imageUrl}', 'image${index + 1}.jpg')" 
-                                    class="absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all">
-                                    <i class="fas fa-download text-sm"></i>
-                                </button>
-                            </div>
-                    `;
-                });
+                imageContentDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-images text-green-500 mr-2"></i> 图片预览 (${data.images.length}张)
+                    </h3>
 
-                contentContainer.innerHTML += `
-                        </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 mb-4 bg-gray-50 p-3 rounded-lg">
+                        <input type="text" id="filename-input" placeholder="输入文件名"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            value="抖音图片">
+                        <button onclick="downloadAllImages(${JSON.stringify(data.images)}, document.getElementById('filename-input').value || 'douyin_images')"
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center transition-all whitespace-nowrap">
+                            <i class="fas fa-download mr-2"></i> 一键下载所有图片
+                        </button>
                     </div>
                 `;
+
+                // Create the image grid container
+                const imageGrid = document.createElement("div");
+                imageGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"; // Keep Tailwind grid classes
+
+                // Add event listener for individual image downloads using event delegation
+                imageGrid.addEventListener('click', function(event) {
+                   if (event.target.closest('.download-icon')) {
+                       event.preventDefault(); // Prevent the link from navigating
+                       const downloadLink = event.target.closest('.download-icon');
+                       const imageUrl = downloadLink.dataset.url;
+                       const filename = downloadLink.dataset.filename;
+                       downloadResource(imageUrl, filename); // Use the existing downloadResource function
+                   }
+                });
+
+                // Display Images in the grid
+                data.images.forEach((imageUrl, index) => {
+                    const imageContainer = document.createElement("div");
+                    imageContainer.className = "image-container relative group rounded-lg overflow-hidden transition-all"; // Keep existing styling classes
+                    imageContainer.innerHTML = `
+                        <img src="${imageUrl}" alt="图片 ${index + 1}" class="w-full h-auto object-cover transition-all">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all"></div>
+                        <a class="download-icon absolute top-2 right-2 bg-black bg-opacity-70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                           href="#" data-url="${imageUrl}" data-filename="image${index + 1}.jpg">
+                            <i class="fas fa-download text-sm"></i>
+                        </a>
+                    `;
+                    imageGrid.appendChild(imageContainer);
+                });
+
+                // Append the grid to the image content div, then append the div to the content container
+                imageContentDiv.appendChild(imageGrid);
+                contentContainer.appendChild(imageContentDiv);
+
             } else {
                 contentContainer.innerHTML = `
                     <div class="fade-in text-center py-8 text-gray-500">
@@ -459,7 +476,7 @@
                 </div>
             `;
             document.body.appendChild(alertDiv);
-            
+
             setTimeout(() => {
                 alertDiv.classList.remove('fade-in');
                 alertDiv.classList.add('opacity-0', 'transition-all');
@@ -541,7 +558,7 @@
         function displayHistory() {
             const historyList = document.getElementById("history-list");
             historyList.innerHTML = "";
-            
+
             if (history.length === 0) {
                 historyList.innerHTML = `
                     <li class="py-3 text-center text-gray-400">
@@ -555,11 +572,11 @@
                 const listItem = document.createElement("li");
                 listItem.className = "py-3 flex items-center justify-between group fade-in";
                 listItem.innerHTML = `
-                    <a href="#" onclick="loadHistoryItem(${index})" 
+                    <a href="#" onclick="loadHistoryItem(${index})"
                         class="text-blue-600 hover:text-blue-800 hover:underline flex-1 truncate pr-2">
                         <i class="fas fa-link mr-2 text-gray-400"></i>${item.url}
                     </a>
-                    <button onclick="deleteHistoryItem(${index})" 
+                    <button onclick="deleteHistoryItem(${index})"
                         class="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-all">
                         <i class="fas fa-trash-alt"></i>
                     </button>
@@ -572,13 +589,13 @@
             const item = history[index];
             document.getElementById("douyin-url").value = item.url;
             displayData(item.data);
-            
+
             // Scroll to top
             window.scrollTo({
                 top: 0,
                 behavior: 'smooth'
             });
-            
+
             showAlert("已加载历史记录！", "success");
         }
 
@@ -586,7 +603,7 @@
             history.splice(index, 1);
             localStorage.setItem("douyinHistory", JSON.stringify(history));
             displayHistory();
-            
+
             // Clear the data currently displayed if it matches the deleted history
             document.getElementById("info-container").innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full text-gray-400">
@@ -601,7 +618,7 @@
                 </div>
             `;
             document.getElementById("douyin-url").value = "";
-            
+
             showAlert("已删除历史记录！", "success");
         }
     </script>
