@@ -75,13 +75,41 @@
 
         /* Video player styling */
         #video-player {
+            display: block;
+            margin: 0 auto;
             border-radius: 0.5rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 100%;
+            height: auto;
+            max-height: calc(100vh - 100px); /* Limit height for better layout */
         }
 
         /* Smooth transitions */
         .transition-all {
             transition: all 0.2s ease;
+        }
+
+        /* Title clamping and expand/collapse */
+        .title-clamp {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3; /* Limit to 3 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .title-clamp.expanded {
+            -webkit-line-clamp: unset; /* Show full content when expanded */
+            overflow: visible;
+            text-overflow: unset;
+        }
+
+        .expand-button {
+            cursor: pointer;
+            color: #1d4ed8; /* blue-700 */
+            font-size: 0.875rem; /* text-sm */
+            margin-top: 0.5rem;
+            display: inline-block;
         }
     </style>
 </head>
@@ -339,13 +367,15 @@
                     <div>
                         <img src="${data.cover}" alt="封面" class="w-full h-auto rounded-lg shadow-md">
                     </div>
-                    <div class="md:w-3/4">
-                        <div class="mb-4">
+                    <div>
+                        <div>
                             <h3 class="text-xl font-semibold text-gray-800 mb-2 flex items-center">
                                 <i class="fas fa-user text-blue-500 mr-2"></i> 作者: ${data.name}
                             </h3>
                             <p class="text-gray-700">
-                                <i class="fas fa-heading text-purple-500 mr-2"></i> 标题: ${data.title}
+                                <i class="fas fa-heading text-purple-500 mr-2"></i> 标题:
+                                <span id="video-title" class="title-clamp">${data.title}</span>
+                                <span id="expand-button" class="expand-button" onclick="toggleTitleExpansion()">展开</span>
                             </p>
                         </div>
             `;
@@ -356,13 +386,13 @@
                         <div class="mt-4 flex flex-row gap-4">
                             <div>
                                 <button onclick="copyToClipboard('${data.yvideo}')"
-                                    class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
+                                    class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
                                     <i class="fas fa-copy mr-2"></i> 复制链接
                                 </button>
                             </div>
                             <div>
                                 <a href="/api/download?url=${encodeURIComponent(data.yvideo)}" target="_blank"
-                                    class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm inline-flex items-center transition-all">
+                                    class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm inline-flex items-center transition-all">
                                     <i class="fas fa-download mr-2"></i> 下载视频
                                 </a>
                             </div>
@@ -374,7 +404,7 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <i class="fas fa-play-circle text-red-500 mr-2"></i> 视频预览
                         </h3>
-                        <video id="video-player" controls class="w-full">
+                        <video id="video-player" controls>
                             <source src="/api/video?url=${encodeURIComponent(data.yvideo)}" type="video/mp4">
                             您的浏览器不支持 HTML5 视频。
                         </video>
@@ -385,7 +415,7 @@
                         <div class="mt-4">
                             <div>
                                 <button onclick="copyToClipboard('${data.images[0]}')"
-                                    class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
+                                    class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm flex items-center transition-all">
                                     <i class="fas fa-copy mr-2"></i> 复制封面链接
                                 </button>
                             </div>
@@ -637,6 +667,19 @@
             document.getElementById("douyin-url").value = "";
 
             showAlert("已删除历史记录！", "success");
+        }
+
+        function toggleTitleExpansion() {
+            const titleSpan = document.getElementById('video-title');
+            const expandButton = document.getElementById('expand-button');
+
+            if (titleSpan.classList.contains('expanded')) {
+                titleSpan.classList.remove('expanded');
+                expandButton.textContent = '展开';
+            } else {
+                titleSpan.classList.add('expanded');
+                expandButton.textContent = '收起';
+            }
         }
     </script>
 </body>
